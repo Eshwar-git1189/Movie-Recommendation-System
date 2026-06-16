@@ -15,8 +15,14 @@ library(corrplot)
 
 corr_matrix <- cor(movie_data[, c("userId", "movieId", "rating")])
 
-corrplot(corr_matrix, method = "circle")
+png("outputs/plots/correlation_matrix.png",
+    width=800,
+    height=600)
 
+corrplot(corr_matrix,
+         method="circle")
+
+dev.off()
 #Wrapper Method
 
 #Use stepwise regression for feature selection:

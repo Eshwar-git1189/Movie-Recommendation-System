@@ -23,10 +23,21 @@ head(scaled_data)
 #Visualize the PCA results.
 
 #Scree Plot
-plot(pca_model,
-     type = "l",
-     main = "Scree Plot")
-#Biplot
-biplot(pca_model)
+  png("outputs/plots/scree_plot.png",
+      width=800,
+      height=600)
   
-  These plots help you understand how much information is captured by the principal components and are useful for your report and PPT.
+  plot(pca_model,
+       type="l",
+       main="Scree Plot")
+  
+  dev.off()
+#Biplot
+  png("outputs/plots/pca_biplot.png",
+      width=800,
+      height=600)
+  
+  biplot(pca_model)
+  
+  dev.off()  
+  #These plots help you understand how much information is captured by the principal components and are useful for your report and PPT.

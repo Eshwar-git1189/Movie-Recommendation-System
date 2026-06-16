@@ -20,8 +20,14 @@ head(kmeans_model$cluster)
 install.packages("factoextra")
 library(factoextra)
 
+png("outputs/plots/kmeans_cluster.png",
+    width=800,
+    height=600)
+
 fviz_cluster(kmeans_model,
-           data = scaled_data)
+             data=scaled_data)
+
+dev.off()
 
 #This plot will show how the observations are grouped into the 3 clusters.
 
@@ -58,7 +64,13 @@ library(cluster)
 sil <- silhouette(kmeans_model$cluster,
                   dist(scaled_data))
 
+png("outputs/plots/silhouette_plot.png",
+    width=800,
+    height=600)
+
 plot(sil)
+
+dev.off()
 
 
 #The error:
