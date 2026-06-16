@@ -2,7 +2,7 @@
 
 #First, install and load the required package:
 
-install.packages("arules")
+#install.packages("arules")
 library(arules)
 
 #Then we'll prepare the data for association rule mining. Don't run Apriori yet.

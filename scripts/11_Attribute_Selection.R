@@ -10,7 +10,7 @@ cor(movie_data[, c("userId", "movieId", "rating")])
 
 #You can also visualize it:
   
-install.packages("corrplot")    # Run once in Console
+#install.packages("corrplot")    # Run once in Console
 library(corrplot)
 
 corr_matrix <- cor(movie_data[, c("userId", "movieId", "rating")])

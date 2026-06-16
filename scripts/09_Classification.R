@@ -129,7 +129,7 @@ f1_knn
 #Now implement Naive Bayes.
 
 #Load the package:
-install.packages("e1071")
+#install.packages("e1071")
 library(e1071)
 
 #Train the model:
