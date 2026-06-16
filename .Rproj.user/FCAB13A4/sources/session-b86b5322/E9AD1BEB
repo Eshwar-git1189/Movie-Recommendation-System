@@ -1,0 +1,26 @@
+{
+    "id": "E9AD1BEB",
+    "path": "~/Data Analytics/MovieLens/MovieReccomendationSystem/scripts/11_Attribute_Selection.R",
+    "project_path": "scripts/11_Attribute_Selection.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": true,
+    "created": 1781628235497.0,
+    "source_on_save": false,
+    "relative_order": 11,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "29,19",
+        "scrollLine": "9"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1781628235,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1781628318339,
+    "read_only": false,
+    "read_only_alternatives": []
+}
