@@ -52,8 +52,9 @@ movie_genres <- unique(movie_data[, c("movieId", "title", genre_list)])
 
 # Merge into movie-level dataset
 movie_level <- merge(movie_avg, rating_counts, by = "movieId")
-movie_level <- merge(movie_level, movie_genres, by = c("movieId", "title"))
-
+movie_level <- merge(movie_level,
+                     movie_genres,
+                     by = "movieId")
 # Inspect the movie-level dataset
 head(movie_level)
 dim(movie_level)
@@ -65,16 +66,4 @@ cat("Preprocessing complete.\n")
 cat("Movie-level dataset:", nrow(movie_level), "movies\n")
 cat("Features:", ncol(movie_level), "\n")
 
-# Write PCA metrics to JSON for report generation
-prop_var <- pca_model$sdev^2 / sum(pca_model$sdev^2)
-cum_var <- cumsum(prop_var)
-source("scripts/_write_metrics.R")
-update_metrics(list(
-  pc1_var = round(prop_var[1], 4),
-  pc1_cum = round(cum_var[1], 4),
-  pc2_var = round(prop_var[2], 4),
-  pc2_cum = round(cum_var[2], 4),
-  pc3_var = round(prop_var[3], 4),
-  pc3_cum = round(cum_var[3], 4)
-), "outputs/results/metrics.json")
-cat("PCA metrics written to outputs/results/metrics.json\n")
+# ================================================== # Create Results File # ================================================== prop_var <- pca_model$sdev^2 / sum(pca_model$sdev^2) cum_var <- cumsum(prop_var) sink("outputs/results/pca_results.md") cat("# Principal Component Analysis (PCA) Results\n\n") cat("## Variance Explained by Principal Components\n\n") cat("| Principal Component | Proportion of Variance | Cumulative Variance |\n") cat("|-------------------|----------------------:|-------------------:|\n") for(i in 1:length(prop_var)) { cat("| PC", i, " | ", round(prop_var[i], 4), " | ", round(cum_var[i], 4), " |\n", sep = "") } cat("\n---\n\n") cat("## Visualizations\n\n") cat("- Scree Plot (`scree_plot.png`)\n") cat("- PCA Biplot (`pca_biplot.png`)\n") cat("\n---\n\n") cat("## Movie-Level Dataset\n\n") cat("- Number of movies: ", nrow(movie_level), "\n", sep = "") cat("- Number of features: ", ncol(movie_level), "\n", sep = "") cat("\n---\n\n") cat("## Interpretation\n\n") cat("Principal Component Analysis (PCA) was performed on the genre indicator variables after scaling.\n\n") cat("PCA reduces the dimensionality of the data while preserving the maximum amount of information.\n\n") cat("The Scree Plot and PCA Biplot were used to visualize the variance explained by the principal components and the relationships among variables.\n") sink() cat("Results written to outputs/results/pca_results.md\n")

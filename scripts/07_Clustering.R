@@ -52,3 +52,74 @@ dev.off()
 cat("Cluster sizes:", kmeans_model$size, "\n")
 cat("Cluster centers:\n")
 print(kmeans_model$centers)
+
+# ==================================================
+# Create Results File
+# ==================================================
+
+sink("outputs/results/clustering_results.md")
+
+cat("# K-Means Clustering Results\n\n")
+
+cat("## Number of Clusters\n\n")
+
+cat("- Number of clusters used: 3\n")
+
+cat("\n---\n\n")
+
+cat("## Cluster Sizes\n\n")
+
+cat("| Cluster | Number of Movies |\n")
+cat("|---------|----------------:|\n")
+
+for(i in 1:length(kmeans_model$size)) {
+  cat("| ",
+      i,
+      " | ",
+      kmeans_model$size[i],
+      " |\n",
+      sep = "")
+}
+
+cat("\n---\n\n")
+
+cat("## Cluster Centers\n\n")
+
+print(round(kmeans_model$centers, 4))
+
+cat("\n---\n\n")
+
+cat("## Sample Movies from Each Cluster\n\n")
+
+cat("### Cluster 1\n\n")
+print(head(movie_level[movie_level$cluster == 1,
+                       c("title", "avg_rating", "rating_count")]))
+
+cat("\n### Cluster 2\n\n")
+print(head(movie_level[movie_level$cluster == 2,
+                       c("title", "avg_rating", "rating_count")]))
+
+cat("\n### Cluster 3\n\n")
+print(head(movie_level[movie_level$cluster == 3,
+                       c("title", "avg_rating", "rating_count")]))
+
+cat("\n---\n\n")
+
+cat("## Visualizations\n\n")
+
+cat("- K-Means Cluster Plot (`kmeans_cluster.png`)\n")
+cat("- Cluster Centers Plot (`cluster_centers.png`)\n")
+
+cat("\n---\n\n")
+
+cat("## Interpretation\n\n")
+
+cat("K-Means clustering was performed using average rating, rating count, and genre indicators.\n\n")
+
+cat("Movies were grouped into three clusters based on their similarities.\n\n")
+
+cat("Cluster centers represent the average feature values of each cluster and help understand the characteristics of the movies in each group.\n")
+
+sink()
+
+cat("Results written to outputs/results/clustering_results.md\n")
