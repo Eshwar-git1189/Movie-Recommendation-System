@@ -138,6 +138,20 @@ Implemented:
 
 Run scripts in numerical order (01 through 12). Each script depends on the output of previous scripts. The genre extraction script (04) must run before any analysis scripts (06-12).
 
+### Helper Script
+
+- `_write_metrics.R` — Shared helper sourced by scripts 05, 06, 09, 10, 12 to write computed metrics to `outputs/results/metrics.json`.
+
+### Regenerating the Report
+
+After running all R scripts, regenerate the DOCX report with:
+
+```bash
+python gen_report.py
+```
+
+The script reads `outputs/results/metrics.json` (written by R scripts 05, 06, 09, 10, 12) to populate metric values. If the JSON file is missing, it falls back to placeholder text.
+
 ## Conclusion
 
 This project demonstrates the complete Data Analytics Lifecycle using a recommendation system scenario. Techniques including descriptive statistics, PCA, clustering, association rule mining, regression, classification, statistical testing, and attribute selection were applied to derive meaningful insights from the MovieLens dataset using genre-based features.

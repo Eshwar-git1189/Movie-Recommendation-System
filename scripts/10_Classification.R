@@ -97,3 +97,17 @@ cat("Logistic Regression   ", round(accuracy, 4), "  ", round(precision, 4),
     "  ", round(recall, 4), "  ", round(f1_score, 4), "\n")
 cat("KNN (k=5)             ", round(accuracy_knn, 4), "  ", round(precision_knn, 4),
     "  ", round(recall_knn, 4), "  ", round(f1_knn, 4), "\n")
+
+# Write classification metrics to JSON for report generation
+source("scripts/_write_metrics.R")
+update_metrics(list(
+  lr_accuracy = round(accuracy, 4),
+  lr_precision = round(precision, 4),
+  lr_recall = round(recall, 4),
+  lr_f1 = round(f1_score, 4),
+  knn_accuracy = round(accuracy_knn, 4),
+  knn_precision = round(precision_knn, 4),
+  knn_recall = round(recall_knn, 4),
+  knn_f1 = round(f1_knn, 4)
+), "outputs/results/metrics.json")
+cat("Classification metrics written to outputs/results/metrics.json\n")

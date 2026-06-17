@@ -46,3 +46,10 @@ barplot(table(movie_data$rating),
         ylab = "Count",
         col = "lightgreen")
 dev.off()
+
+# Write metrics to JSON for report generation (update existing file)
+std_dev <- sd(movie_data$rating)
+variance <- var(movie_data$rating)
+source("scripts/_write_metrics.R")
+update_metrics(list(std_dev = round(std_dev, 4), variance = round(variance, 4)), "outputs/results/metrics.json")
+cat("Metrics written to outputs/results/metrics.json\n")

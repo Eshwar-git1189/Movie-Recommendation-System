@@ -64,3 +64,17 @@ save(movie_level, file = "data/movie_level_data.RData")
 cat("Preprocessing complete.\n")
 cat("Movie-level dataset:", nrow(movie_level), "movies\n")
 cat("Features:", ncol(movie_level), "\n")
+
+# Write PCA metrics to JSON for report generation
+prop_var <- pca_model$sdev^2 / sum(pca_model$sdev^2)
+cum_var <- cumsum(prop_var)
+source("scripts/_write_metrics.R")
+update_metrics(list(
+  pc1_var = round(prop_var[1], 4),
+  pc1_cum = round(cum_var[1], 4),
+  pc2_var = round(prop_var[2], 4),
+  pc2_cum = round(cum_var[2], 4),
+  pc3_var = round(prop_var[3], 4),
+  pc3_cum = round(cum_var[3], 4)
+), "outputs/results/metrics.json")
+cat("PCA metrics written to outputs/results/metrics.json\n")

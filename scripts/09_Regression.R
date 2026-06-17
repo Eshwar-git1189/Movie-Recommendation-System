@@ -69,3 +69,13 @@ cat("MAE:", MAE, "\n")
 cat("MSE:", MSE, "\n")
 cat("RMSE:", RMSE, "\n")
 cat("R-squared:", R2, "\n")
+
+# Write regression metrics to JSON for report generation
+source("scripts/_write_metrics.R")
+update_metrics(list(
+  reg_mae = round(MAE, 4),
+  reg_mse = round(MSE, 4),
+  reg_rmse = round(RMSE, 4),
+  reg_r_squared = round(R2, 4)
+), "outputs/results/metrics.json")
+cat("Regression metrics written to outputs/results/metrics.json\n")

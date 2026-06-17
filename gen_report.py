@@ -1,10 +1,23 @@
+import json
+import os
 from docx import Document
 from docx.shared import Pt, Inches, Cm, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn, nsdecls
 from docx.oxml import parse_xml
-import os
+
+METRICS_PATH = os.path.join(os.path.dirname(__file__), 'outputs/results/metrics.json')
+_METRICS_CACHE = None
+def get_metric(key, default='[Run R to compute]'):
+    global _METRICS_CACHE
+    if _METRICS_CACHE is None:
+        try:
+            with open(METRICS_PATH) as f:
+                _METRICS_CACHE = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            _METRICS_CACHE = {}
+    return _METRICS_CACHE.get(key, default)
 
 doc = Document()
 
@@ -405,7 +418,7 @@ add_table(
     ['Phase', 'Focus', 'Key Activities in This Project'],
     [
         ['1. Discovery', 'Frame business problem and success criteria', 'Define recommendation problem, target population, and success metrics'],
-        ['2. Data Preparation', 'Clean and structure raw data', 'Import CSV files, merge on movieId, clean data, extract genre indicators'],
+        ['2. Data Preparation', 'Clean and structure raw data', 'Import CSV files, merge datasets, clean data, extract genre indicators'],
         ['3. Model Planning', 'Explore data and select modelling strategy', 'Descriptive statistics, genre PCA, correlation analysis, train/test split'],
         ['4. Model Building', 'Train candidate models', 'K-Means, Apriori, Linear Regression, Logistic Regression, KNN'],
         ['5. Communicate Results', 'Evaluate and compare models', 'Classification reports, confusion matrices, performance metrics, visualizations'],
@@ -447,17 +460,8 @@ add_heading_custom('4. Phase 2 - Data Preparation', 1)
 add_heading_custom('4.1 Data Import and Merging', 2)
 doc.add_paragraph(
     'The MovieLens dataset consists of four CSV files. The ratings and movies tables were loaded into R '
-    'and merged on the movieId column. The merged dataset contains 100,836 observations with columns: '
-    'movieId, rating, timestamp, userId, title, and genres.'
-)
-add_table(
-    ['File', 'Rows', 'Key Columns'],
-    [
-        ['ratings.csv', '100,837', 'userId, movieId, rating, timestamp'],
-        ['movies.csv', '9,743', 'movieId, title, genres'],
-        ['tags.csv', '3,684', 'userId, movieId, tag, timestamp'],
-        ['links.csv', '9,743', 'movieId, imdbId, tmdbId'],
-    ]
+    'and merged by movie identifier. The merged dataset contains 100,836 observations with ratings, '
+    'movie information, and genre details for each user-movie interaction.'
 )
 
 add_heading_custom('4.2 Data Cleaning', 2)
@@ -507,8 +511,8 @@ add_table(
     [
         ['Mean', '~3.5'],
         ['Median', '~3.5'],
-        ['Standard Deviation', '[Run R to compute]'],
-        ['Variance', '[Run R to compute]'],
+        ['Standard Deviation', get_metric('std_dev')],
+        ['Variance', get_metric('variance')],
     ]
 )
 doc.add_paragraph(
@@ -527,9 +531,9 @@ doc.add_paragraph(
 add_table(
     ['Component', 'Variance Explained', 'Cumulative'],
     [
-        ['PC1', '[Run R to compute]', '[Run R to compute]'],
-        ['PC2', '[Run R to compute]', '[Run R to compute]'],
-        ['PC3', '[Run R to compute]', '[Run R to compute]'],
+        ['PC1', get_metric('pc1_var'), get_metric('pc1_cum')],
+        ['PC2', get_metric('pc2_var'), get_metric('pc2_cum')],
+        ['PC3', get_metric('pc3_var'), get_metric('pc3_cum')],
     ]
 )
 add_image(f'{plots_dir}/scree_plot.png', '2.1', 'Scree plot showing variance explained by each principal component from genre PCA.')
@@ -589,10 +593,10 @@ doc.add_paragraph(
 add_table(
     ['Metric', 'Value'],
     [
-        ['MAE', '[Run R to compute]'],
-        ['MSE', '[Run R to compute]'],
-        ['RMSE', '[Run R to compute]'],
-        ['R-squared', '[Run R to compute]'],
+        ['MAE', get_metric('reg_mae')],
+        ['MSE', get_metric('reg_mse')],
+        ['RMSE', get_metric('reg_rmse')],
+        ['R-squared', get_metric('reg_r_squared')],
     ]
 )
 doc.add_paragraph(
@@ -608,10 +612,10 @@ doc.add_paragraph('Logistic Regression using genre indicators as features to pre
 add_table(
     ['Metric', 'Value'],
     [
-        ['Accuracy', '[Run R to compute]'],
-        ['Precision', '[Run R to compute]'],
-        ['Recall', '[Run R to compute]'],
-        ['F1-Score', '[Run R to compute]'],
+        ['Accuracy', get_metric('lr_accuracy')],
+        ['Precision', get_metric('lr_precision')],
+        ['Recall', get_metric('lr_recall')],
+        ['F1-Score', get_metric('lr_f1')],
     ]
 )
 add_heading_custom('K-Nearest Neighbors (KNN)', 3)
@@ -619,10 +623,10 @@ doc.add_paragraph('KNN with k = 5 using genre indicators as feature space.')
 add_table(
     ['Metric', 'Value'],
     [
-        ['Accuracy', '[Run R to compute]'],
-        ['Precision', '[Run R to compute]'],
-        ['Recall', '[Run R to compute]'],
-        ['F1-Score', '[Run R to compute]'],
+        ['Accuracy', get_metric('knn_accuracy')],
+        ['Precision', get_metric('knn_precision')],
+        ['Recall', get_metric('knn_recall')],
+        ['F1-Score', get_metric('knn_f1')],
     ]
 )
 
@@ -665,16 +669,16 @@ doc.add_paragraph(
 
 add_heading_custom('7.6 Classification Performance', 2)
 add_heading_custom('Logistic Regression', 3)
-doc.add_paragraph('[Run R to populate confusion matrix values.]')
+doc.add_paragraph('Logistic Regression was trained using all 18 genre indicators as predictors with a binary target (liked = rating >= 4).')
 add_heading_custom('K-Nearest Neighbors (KNN)', 3)
-doc.add_paragraph('[Run R to populate confusion matrix values.]')
+doc.add_paragraph('KNN with k = 5 was applied using standardized genre features to classify liked vs not-liked movies.')
 
 add_heading_custom('7.7 Performance Comparison', 2)
 add_table(
     ['Model', 'Accuracy', 'Precision', 'Recall', 'F1-Score'],
     [
-        ['Logistic Regression', '[Run R]', '[Run R]', '[Run R]', '[Run R]'],
-        ['KNN (k=5)', '[Run R]', '[Run R]', '[Run R]', '[Run R]'],
+        ['Logistic Regression', get_metric('lr_accuracy'), get_metric('lr_precision'), get_metric('lr_recall'), get_metric('lr_f1')],
+        ['KNN (k=5)', get_metric('knn_accuracy'), get_metric('knn_precision'), get_metric('knn_recall'), get_metric('knn_f1')],
     ]
 )
 
@@ -688,11 +692,11 @@ doc.add_paragraph(
 )
 add_table(
     ['Genre', 'Correlation with Rating'],
-    [['[Top genre]', '[Run R to compute]'],
-     ['[2nd genre]', '[Run R to compute]'],
-     ['[3rd genre]', '[Run R to compute]'],
-     ['[4th genre]', '[Run R to compute]'],
-     ['[5th genre]', '[Run R to compute]']],
+    [[get_metric('top1_genre', '[Top genre]'), get_metric('top1_cor')],
+     [get_metric('top2_genre', '[2nd genre]'), get_metric('top2_cor')],
+     [get_metric('top3_genre', '[3rd genre]'), get_metric('top3_cor')],
+     [get_metric('top4_genre', '[4th genre]'), get_metric('top4_cor')],
+     [get_metric('top5_genre', '[5th genre]'), get_metric('top5_cor')]],
 )
 add_image(f'{plots_dir}/correlation_matrix.png', '5.1', 'Correlation matrix heatmap of rating and 18 genre indicators.')
 
@@ -705,8 +709,8 @@ add_table(
     ['Parameter', 'Value'],
     [
         ['Starting Model', 'rating ~ all 18 genres'],
-        ['Selected Features', '[Run R to determine]'],
-        ['R-squared', '[Run R to compute]'],
+        ['Selected Features', get_metric('selected_features', '[Run R to determine]')],
+        ['R-squared', get_metric('stepwise_r_squared')],
     ]
 )
 
@@ -802,9 +806,9 @@ doc.add_paragraph(
     '(Communicate Results), and clear documentation for deployment (Operationalization).'
 )
 doc.add_paragraph(
-    'The genre-based approach provides interpretable, meaningful features that replace the non-informative '
-    'numeric userId and movieId identifiers used in earlier iterations. This demonstrates how domain-specific '
-    'feature engineering improves both model interpretability and alignment with the business problem.'
+    'The genre-based approach provides interpretable, meaningful features grounded in domain knowledge about '
+    'movie characteristics. This demonstrates how domain-specific feature engineering improves both model '
+    'interpretability and alignment with the business problem.'
 )
 
 # =========================== APPENDIX A ===========================
@@ -888,5 +892,5 @@ scripts = [
 ]
 for s in scripts:
     print(f'  {s}')
-print('\nAfter running all scripts, plots and results will be regenerated.')
-print('Then re-run this DOCX generator for updated values.')
+print('\nScripts 05, 06, 09, 10, 12 each write metrics to outputs/results/metrics.json.')
+print('After running all scripts, re-run this DOCX generator to populate the report with actual values.')

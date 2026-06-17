@@ -58,3 +58,23 @@ cat(names(coef(step_model))[-1], sep = ", ")
 # Compare R-squared values
 cat("\n\nFull model R-squared:", summary(full_model)$r.squared, "\n")
 cat("Stepwise model R-squared:", summary(step_model)$r.squared, "\n")
+
+# Write attribute selection metrics to JSON for report generation
+selected_feat <- names(coef(step_model))[-1]
+selected_feat_str <- if (length(selected_feat) > 0) paste(selected_feat, collapse = ", ") else "None"
+source("scripts/_write_metrics.R")
+update_metrics(list(
+  top1_genre = names(rating_cor)[1],
+  top1_cor = round(rating_cor[1], 4),
+  top2_genre = names(rating_cor)[2],
+  top2_cor = round(rating_cor[2], 4),
+  top3_genre = names(rating_cor)[3],
+  top3_cor = round(rating_cor[3], 4),
+  top4_genre = names(rating_cor)[4],
+  top4_cor = round(rating_cor[4], 4),
+  top5_genre = names(rating_cor)[5],
+  top5_cor = round(rating_cor[5], 4),
+  selected_features = selected_feat_str,
+  stepwise_r_squared = round(summary(step_model)$r.squared, 4)
+), "outputs/results/metrics.json")
+cat("Attribute selection metrics written to outputs/results/metrics.json\n")
